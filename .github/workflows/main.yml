@@ -21,4 +21,5 @@ jobs:
       with:
         artifacts: "SympleGraphDisplay-${{ steps.commit.outputs.short }}.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit: true
+        commit: 'master'
+        tag: ${{ steps.commit.outputs.short }}
