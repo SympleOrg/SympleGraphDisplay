@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 26
+        minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
     }
@@ -28,4 +28,19 @@ dependencies {
     api "org.firstinspires.ftc:FtcCommon:9.2.0"
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
+}
+
+task copyDashAssets(type: Copy) {
+    from "${project.projectDir}/graph"
+    into "${android.sourceSets.getByName("main").assets.srcDirs[0]}/graph"
+}
+
+task cleanDashAssets(type: Delete) {
+    delete "${android.sourceSets.getByName("main").assets.srcDirs[0]}/graph"
+}
+
+copyDashAssets.dependsOn cleanDashAssets
+
+android.libraryVariants.all { variant ->
+    variant.preBuildProvider.get().dependsOn copyDashAssets
 }

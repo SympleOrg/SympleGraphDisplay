@@ -173,12 +173,19 @@ public class SympleGraphDisplay implements OpModeManagerNotifier.Notifications {
         webHandlerManager.register("/graph/",
                 newStaticAssetHandler(assetManager, "graph/html/index.html"));
 
-        webHandlerManager.register("/graph/assets/chartjs-plugin-zoom.min.js",
-                newStaticAssetHandler(assetManager, "graph/assets/chartjs-plugin-zoom.min.js"));
-        webHandlerManager.register("/graph/assets/index.js",
-                newStaticAssetHandler(assetManager, "graph/assets/index.js"));
-        webHandlerManager.register("/graph/assets/style.css",
-                newStaticAssetHandler(assetManager, "graph/assets/style.css"));
+        String[] staticAssets = new String[] {
+                "chart.min.js",
+                "chartjs-plugin-autocolors.js",
+                "hammerjs.js",
+                "chartjs-plugin-zoom.min.js",
+                "index.js",
+                "style.css"
+        };
+
+        for (String path : staticAssets) {
+            webHandlerManager.register("/graph/assets/"+path,
+                    newStaticAssetHandler(assetManager, "graph/assets/"+path));
+        }
     }
 
     private void internalAttachEventLoop(FtcEventLoop eventLoop) {
