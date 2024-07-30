@@ -16,7 +16,7 @@ jobs:
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: 'zip'
-        filename: 'release.zip'
+        filename: 'SympleGraphDisplay-${{ steps.commit.outputs.short }}.zip'
         path: './symplegraphdisplay'
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
