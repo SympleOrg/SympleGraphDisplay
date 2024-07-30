@@ -25,3 +25,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         commit: 'master'
         tag: ${{ steps.commit.outputs.short }}
+        makeLatest: true
