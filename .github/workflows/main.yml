@@ -1,10 +1,11 @@
 name: Build & Publish Package
-on: 
+on:
   push:
     branches:
       - master
     paths:
       - symplegraphdisplay/**
+  workflow_dispatch:
 jobs:
   release:
     name: Create a github release
