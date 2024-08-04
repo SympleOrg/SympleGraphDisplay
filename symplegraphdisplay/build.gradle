@@ -57,7 +57,7 @@ publishing {
             artifactId "symplegraphdisplay"
             version findProperty("version")
 
-            artifact("$buildDir/output/arr/symplegraphdisplay-release.aar")
+            artifact("$buildDir/outputs/arr/symplegraphdisplay-release.aar")
         }
     }
 
