@@ -19,7 +19,7 @@ public class TestOpMode extends LinearOpMode implements DataListenerGroup {
     private double speed = 0;
 
     private void initialize() {
-        SympleGraphDisplay.getInstance().init();
+        SympleGraphDisplay.getInstance().reset();
         SympleGraphDisplay.getInstance().setUpdateTime(0.05);
         SympleGraphDisplay.getInstance().registerDataListenerGroup(this);
     }
@@ -31,9 +31,7 @@ public class TestOpMode extends LinearOpMode implements DataListenerGroup {
         testValue = speed / (new Random().nextDouble() * 30);
     }
 
-    private void reset() {
-
-    }
+    private void reset() { }
 
     @Override
     public void runOpMode() throws InterruptedException {

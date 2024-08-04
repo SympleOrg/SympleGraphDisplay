@@ -38,36 +38,25 @@ import top.symple.symplegraphdisplay.packets.Packet;
 import top.symple.symplegraphdisplay.packets.ResetGraphDataPacket;
 import top.symple.symplegraphdisplay.util.Timer;
 
-public class SympleGraphDisplay implements OpModeManagerNotifier.Notifications {
+public class SympleGraphDisplay {
     private static final String PREFS_NAME = "SympleGraphDisplay";
     private static final String PREFS_AUTO_ENABLE_KEY = "autoEnable";
     private SharedPreferences prefs;
 
     private static SympleGraphDisplay instance;
-
-    private final WebsocketServer websocketServer;
-    private final DataManager dataManager;
-
-    private OpModeManagerImpl opModeManager;
-
-    private double updateTime = 0.05;
-    private final Timer timer = new Timer();
+    private SympleGraphDisplayCore core;
 
     private boolean isEnabled = false;
 
-    private static boolean suppressOpMode = false;
-
+    // register the op mode
     @OpModeRegistrar
     public static void registerOpMode(OpModeManager manager) {
-        if(instance != null && !suppressOpMode) {
+        if(instance != null) {
             instance.internalRegisterOpMode(manager);
         }
     }
 
-    public static void suppressOpMode() {
-        suppressOpMode = true;
-    }
-
+    // create new instance when the robot is turned on
     @OnCreate
     public static void onCreate(Context context) {
         if (instance == null) {
@@ -75,21 +64,15 @@ public class SympleGraphDisplay implements OpModeManagerNotifier.Notifications {
         }
     }
 
+    // register the web pages
     @WebHandlerRegistrar
     public static void attachWebServer(Context context, WebHandlerManager manager) {
         if (instance != null) {
             instance.internalAttachWebServer(manager.getWebServer());
-
         }
     }
 
-    @OnCreateEventLoop
-    public static void attachEventLoop(Context context, FtcEventLoop eventLoop) {
-        if (instance != null) {
-            instance.internalAttachEventLoop(eventLoop);
-        }
-    }
-
+    // close everything when the robot is turned off
     @OnDestroy
     public static void destroy(Context context) throws IOException, InterruptedException {
         if(instance != null) {
@@ -124,11 +107,8 @@ public class SympleGraphDisplay implements OpModeManagerNotifier.Notifications {
     }
 
     private void close() throws IOException, InterruptedException {
-        websocketServer.stop();
+        this.core.getWebsocketServer().stop();
 
-        if (opModeManager != null) {
-            opModeManager.unregisterListener(this);
-        }
         disable();
     }
 
@@ -188,18 +168,6 @@ public class SympleGraphDisplay implements OpModeManagerNotifier.Notifications {
         }
     }
 
-    private void internalAttachEventLoop(FtcEventLoop eventLoop) {
-        // this could be called multiple times within the lifecycle of the dashboard
-        if (opModeManager != null) {
-            opModeManager.unregisterListener(this);
-        }
-
-        opModeManager = eventLoop.getOpModeManager();
-        if (opModeManager != null) {
-            opModeManager.registerListener(this);
-        }
-    }
-
     private WebHandler newStaticAssetHandler(final AssetManager assetManager, final String file) {
         return new WebHandler() {
             @Override
@@ -219,83 +187,66 @@ public class SympleGraphDisplay implements OpModeManagerNotifier.Notifications {
 
 
     private SympleGraphDisplay() {
-        this.websocketServer = new WebsocketServer(3334);
-        this.websocketServer.start();
+        this.core = new SympleGraphDisplayCore();
 
         Activity activity = AppUtil.getInstance().getActivity();
         prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         if(getAutoEnable()) {
             enable();
         }
-
-        this.dataManager = new DataManager();
     }
 
     public static SympleGraphDisplay getInstance() {
         return instance;
     }
 
-    public void init() {
-        reset();
-    }
-
+    /**
+     * reset the current graph data
+     */
     public void reset() {
-        this.timer.reset();
-        this.dataManager.reset();
-        this.updateTime = 1;
-        this.sendPacket(new ResetGraphDataPacket());
+        this.core.reset();
     }
 
+    /**
+     *  use this to update the graph
+     */
     public void run() {
-        timer.run();
-        if(timer.getCurrentTime() >= updateTime) {
-            update();
-            timer.reset();
-        }
+        this.core.run();
     }
 
+    /**
+     * all all new points to the graph
+     * please use {@link SympleGraphDisplay#run()} instead
+     */
     public void update() {
-        this.dataManager.addAllNewData();
+        this.core.update();
     }
 
+    /**
+     * Add data listener
+     * @param dataListenerGroup data listener
+     */
     public void registerDataListenerGroup(DataListenerGroup... dataListenerGroup) {
-        for (DataListenerGroup dlg : dataListenerGroup) {
-            this.dataManager.registerClass(dlg);
-        }
-    }
-
-    public void sendPacket(Collection<WebSocket> clients, Packet packet) {
-        this.websocketServer.broadcast(String.format("{\"type\": \"%s\", \"data\": %s}", packet.getId(), packet.encodePacket()), clients);
-    }
-
-    public void sendPacket(Packet packet) {
-        this.sendPacket(this.websocketServer.getConnections(), packet);
+        this.core.registerDataListenerGroup(dataListenerGroup);
     }
 
     public DataManager getDataManager() {
-        return dataManager;
+        return this.core.getDataManager();
     }
 
+    /**
+     * Get the delay between graph updates
+     * @return delay between graph updates in sec
+     */
     public double getUpdateTime() {
-        return updateTime;
+        return this.core.getUpdateTime();
     }
 
+    /**
+     * Set the delay between graph updates
+     * @param updateTime time in sec
+     */
     public void setUpdateTime(double updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public void onOpModePreInit(OpMode opMode) {
-
-    }
-
-    @Override
-    public void onOpModePreStart(OpMode opMode) {
-
-    }
-
-    @Override
-    public void onOpModePostStop(OpMode opMode) {
-
+        this.core.setUpdateTime(updateTime);
     }
 }

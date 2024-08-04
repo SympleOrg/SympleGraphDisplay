@@ -9,20 +9,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import top.symple.symplegraphdisplay.SympleGraphDisplay;
+import top.symple.symplegraphdisplay.SympleGraphDisplayCore;
 import top.symple.symplegraphdisplay.packets.ResetGraphDataPacket;
 
 public class WebsocketServer extends WebSocketServer {
-    public WebsocketServer(int port) {
+    private final SympleGraphDisplayCore core;
+
+    public WebsocketServer(int port, SympleGraphDisplayCore core) {
         super(new InetSocketAddress(port));
+        this.core = core;
     }
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         List<WebSocket> socketList = new ArrayList<WebSocket>(){{ add(webSocket); }};
 
-        SympleGraphDisplay.getInstance().sendPacket(new ResetGraphDataPacket());
-        SympleGraphDisplay.getInstance().getDataManager().sendAllGraphInitData(socketList);
-        SympleGraphDisplay.getInstance().getDataManager().sendAllPreviousGraphData(socketList);
+        this.core.sendPacket(new ResetGraphDataPacket());
+        this.core.getDataManager().sendAllGraphInitData(socketList);
+        this.core.getDataManager().sendAllPreviousGraphData(socketList);
     }
 
     @Override

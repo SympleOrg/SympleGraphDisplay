@@ -10,14 +10,18 @@ import java.util.List;
 import java.util.Map;
 
 import top.symple.symplegraphdisplay.SympleGraphDisplay;
+import top.symple.symplegraphdisplay.SympleGraphDisplayCore;
 import top.symple.symplegraphdisplay.packets.InitGraphDataPacket;
 import top.symple.symplegraphdisplay.packets.UpdateGraphDataPacket;
 import top.symple.symplegraphdisplay.util.ColorRGBA;
 
 public class DataManager {
     private final HashMap<Integer, DataField> fieldsMap = new HashMap<>();
+    private final SympleGraphDisplayCore core;
 
-    public DataManager() { }
+    public DataManager(SympleGraphDisplayCore core) {
+        this.core = core;
+    }
 
     public void registerClass(DataListenerGroup dataListenerGroup) {
         for(Field field : dataListenerGroup.getClass().getDeclaredFields()) {
@@ -54,19 +58,19 @@ public class DataManager {
     }
 
     public void sendGraphInitPacket(Collection<WebSocket> clients, int id, String label, ColorRGBA color, ColorRGBA fillColor) {
-        SympleGraphDisplay.getInstance().sendPacket(clients, new InitGraphDataPacket(id, label, color, fillColor));
+        this.core.sendPacket(clients, new InitGraphDataPacket(id, label, color, fillColor));
     }
 
     public void sendGraphInitPacket(int id, String label, ColorRGBA color, ColorRGBA fillColor) {
-        SympleGraphDisplay.getInstance().sendPacket(new InitGraphDataPacket(id, label, color, fillColor));
+        this.core.sendPacket(new InitGraphDataPacket(id, label, color, fillColor));
     }
 
     public void sendGraphUpdateDataPacket(HashMap<Integer, List<Double>> newData) {
-        SympleGraphDisplay.getInstance().sendPacket(new UpdateGraphDataPacket(newData));
+        this.core.sendPacket(new UpdateGraphDataPacket(newData));
     }
 
     public void sendGraphUpdateDataPacket(Collection<WebSocket> clients, HashMap<Integer, List<Double>> newData) {
-        SympleGraphDisplay.getInstance().sendPacket(clients, new UpdateGraphDataPacket(newData));
+        this.core.sendPacket(clients, new UpdateGraphDataPacket(newData));
     }
 
 
