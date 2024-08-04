@@ -53,7 +53,7 @@ android.libraryVariants.all { variant ->
 publishing {
     publications {
         bar(MavenPublication) {
-            groupId "symple.top"
+            groupId "top.symple"
             artifactId "symplegraphdisplay"
             version findProperty("version")
 
