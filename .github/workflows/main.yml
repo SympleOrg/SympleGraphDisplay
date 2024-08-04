@@ -20,7 +20,7 @@ jobs:
           java-version: "11"
       - uses: actions/checkout@master
       - name: Expose app version name
-        run: echo "VERSION_NAME=$(./gradlew -q app:printVersionName )" >> $GITHUB_ENV
+        run: echo "VERSION_NAME=$(./gradlew -q :symplegraphdisplay:printVersionName)" >> $GITHUB_ENV
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.5
         with:
