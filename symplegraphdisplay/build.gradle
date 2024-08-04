@@ -1,4 +1,5 @@
 apply plugin: "com.android.library"
+apply plugin: "maven-publish"
 
 android {
     compileSdkVersion 29
@@ -7,6 +8,11 @@ android {
         minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField "String", "GITHUB_TOKEN", "\"${properties.getProperty("github_token")}\""
     }
 
     compileOptions {
@@ -39,8 +45,35 @@ task cleanDashAssets(type: Delete) {
     delete "${android.sourceSets.getByName("main").assets.srcDirs[0]}/graph"
 }
 
+tasks.register("printVersionName") {
+    println(findProperty("version"))
+}
+
 copyDashAssets.dependsOn cleanDashAssets
 
 android.libraryVariants.all { variant ->
     variant.preBuildProvider.get().dependsOn copyDashAssets
+}
+
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId "symple.top"
+            artifactId "symplegraphdisplay"
+            version findProperty("version")
+
+            artifact("$buildDir/output/arr/symplegraphdisplay-release.aar")
+        }
+    }
+
+    repositories {
+        maven {
+            name "GithubPackages"
+            url = uri("https://maven.pkg.github.com/SympleOrg/SympleGraphDisplay")
+            credentials {
+                username = "Symple25125"
+                password = findProperty("github.token")
+            }
+        }
+    }
 }
