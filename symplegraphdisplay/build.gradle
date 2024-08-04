@@ -57,7 +57,9 @@ publishing {
             artifactId "symplegraphdisplay"
             version findProperty("version")
 
-            artifact("$buildDir/outputs/arr/symplegraphdisplay-release.aar")
+            artifact("$buildDir/outputs/arr/symplegraphdisplay-release.aar") {
+                builtBy assemble
+            }
         }
     }
 
@@ -66,8 +68,8 @@ publishing {
             name "GithubPackages"
             url = uri("https://maven.pkg.github.com/SympleOrg/SympleGraphDisplay")
             credentials {
-                username = "Symple25125"
-                password = findProperty("github.token")
+                username = System.getenv("GITHUB_USER")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }

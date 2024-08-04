@@ -67,3 +67,6 @@ jobs:
 
       - name: Publish to Github Package
         run: bash ./gradlew :symplegraphdisplay:publish
+        env:
+          GITHUB_USER: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
