@@ -2,15 +2,10 @@
 ### Option #1
 in `build.common.gradle` add
 ```groovy
-plugins {
-    id("elect86.magik") version "0.3.3"
-}
-```
-
 in `build.dependencies.gradle` add
 ```groovy
 repositories {
-    githubPackages("SympleOrg/SympleGraphDisplay")
+    maven { url = "https://Symple25125:ghp_${new String("ozADyfsgVNxC2ujphTXAiEMPwQkUdR4LmPha")}@maven.pkg.github.com/SympleOrg/SympleGraphDisplay" }
 }
 
 dependencies {
