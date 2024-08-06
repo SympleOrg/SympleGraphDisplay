@@ -3,7 +3,7 @@
 in `build.dependencies.gradle` add
 ```groovy
 repositories {
-    maven { url = uri('https://Symple25125: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@maven.pkg.github.com/SympleOrg/SympleGraphDisplay') }
+    maven { url = uri('https://Symple25125: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@maven.pkg.github.com/SympleOrg/SympleGraphDisplay') }
 }
 
 dependencies {
