@@ -1,9 +1,16 @@
 ## How to install
 ### Option #1
+in `build.common.gradle` add
+```groovy
+plugins {
+    id("elect86.magik") version "0.3.3"
+}
+```
+
 in `build.dependencies.gradle` add
 ```groovy
 repositories {
-    maven { url = uri('https://Symple25125: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@maven.pkg.github.com/SympleOrg/SympleGraphDisplay') }
+    githubPackages("SympleOrg/SympleGraphDisplay")
 }
 
 dependencies {
