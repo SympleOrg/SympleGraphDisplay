@@ -24,9 +24,9 @@ public class DataManager {
     }
 
     public void registerClass(DataListenerGroup dataListenerGroup) {
-        for(Field field : dataListenerGroup.getClass().getDeclaredFields()) {
+        for (Field field : dataListenerGroup.getClass().getDeclaredFields()) {
             field.setAccessible(true);
-            if(!field.isAnnotationPresent(DataListener.class)) continue;
+            if (!field.isAnnotationPresent(DataListener.class)) continue;
 
             DataListener annotation = field.getAnnotation(DataListener.class);
 
@@ -34,10 +34,10 @@ public class DataManager {
             if (label == null || label.trim().isEmpty()) label = field.getName();
 
             Color color = annotation.color();
-            if(color == null || color.alpha() < 0) color = null;
+            if (color == null || color.alpha() < 0) color = null;
 
             Color fillColor = annotation.fillColor();
-            if(fillColor == null || fillColor.alpha() < 0) fillColor = null;
+            if (fillColor == null || fillColor.alpha() < 0) fillColor = null;
 
             DataField dataField = new DataField(label, ColorRGBA.fromColor(color), ColorRGBA.fromColor(fillColor), field, dataListenerGroup);
 
@@ -52,7 +52,7 @@ public class DataManager {
     }
 
     public void sendAllGraphInitData(Collection<WebSocket> clients) {
-        for(Map.Entry<Integer, DataField> entry : fieldsMap.entrySet()) {
+        for (Map.Entry<Integer, DataField> entry : fieldsMap.entrySet()) {
             sendGraphInitPacket(clients, entry.getKey(), entry.getValue().getLabel(), entry.getValue().getColor(), entry.getValue().getFillColor());
         }
     }
@@ -76,7 +76,7 @@ public class DataManager {
 
     public void sendAllPreviousGraphData(Collection<WebSocket> clients) {
         HashMap<Integer, List<Double>> newValues = new HashMap<>();
-        for(Map.Entry<Integer, DataField> entry : fieldsMap.entrySet()) {
+        for (Map.Entry<Integer, DataField> entry : fieldsMap.entrySet()) {
             newValues.put(entry.getKey(), entry.getValue().getData());
         }
 
@@ -85,7 +85,7 @@ public class DataManager {
 
     public void addAllNewData() {
         HashMap<Integer, List<Double>> newValues = new HashMap<>();
-        for(Map.Entry<Integer, DataField> entry : fieldsMap.entrySet()) {
+        for (Map.Entry<Integer, DataField> entry : fieldsMap.entrySet()) {
             double value = 0;
             try {
                 value = entry.getValue().getField().getDouble(entry.getValue().getDataListenerGroup());
@@ -96,13 +96,15 @@ public class DataManager {
             entry.getValue().addData(value);
 
             final double finalValue = value;
-            newValues.put(entry.getKey(), new ArrayList<Double>(){{ add(finalValue); }});
+            newValues.put(entry.getKey(), new ArrayList<Double>() {{
+                add(finalValue);
+            }});
         }
 
         sendGraphUpdateDataPacket(newValues);
     }
 
-    private static class DataField {
+    private class DataField {
         private final List<Double> data;
         private final String label;
         private final ColorRGBA color;
@@ -146,6 +148,9 @@ public class DataManager {
         }
 
         public void addData(double... data) {
+            // if storeData is false, we will exit this method
+            if(!DataManager.this.core.isStoreData()) return;
+
             for (double d : data) {
                 this.data.add(d);
             }

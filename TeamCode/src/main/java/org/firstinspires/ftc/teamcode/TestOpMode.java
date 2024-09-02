@@ -10,7 +10,7 @@ import top.symple.symplegraphdisplay.managers.data.Color;
 import top.symple.symplegraphdisplay.managers.data.DataListener;
 import top.symple.symplegraphdisplay.managers.data.DataListenerGroup;
 
-@TeleOp(name = "test")
+//@TeleOp(name = "test")
 public class TestOpMode extends LinearOpMode implements DataListenerGroup {
 
     @DataListener(color = @Color(red = 0, green = 0, blue = 200), fillColor = @Color(red = 0, green = 0, blue = 200, alpha = 0.1f))

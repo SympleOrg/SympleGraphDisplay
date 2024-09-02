@@ -12,15 +12,15 @@ import top.symple.symplegraphdisplay.packets.ResetGraphDataPacket;
 import top.symple.symplegraphdisplay.util.Timer;
 
 public class SympleGraphDisplayCore {
-    private static final double DEFAULT_UPDATE_TIME = 0.1;
-
     private final WebsocketServer websocketServer;
     private final DataManager dataManager;
 
-    private double updateTime = DEFAULT_UPDATE_TIME;
+    private final GraphSettings settings;
     private final Timer timer = new Timer();
 
-    protected SympleGraphDisplayCore() {
+    protected SympleGraphDisplayCore(GraphSettings settings) {
+        this.settings = settings;
+
         this.websocketServer = new WebsocketServer(3334, this);
         this.websocketServer.start();
 
@@ -34,13 +34,13 @@ public class SympleGraphDisplayCore {
     public void reset() {
         this.timer.reset();
         this.dataManager.reset();
-        this.updateTime = DEFAULT_UPDATE_TIME;
+        this.settings.reset();
         this.sendPacket(new ResetGraphDataPacket());
     }
 
     public void run() {
         timer.run();
-        if(timer.getCurrentTime() >= updateTime) {
+        if (timer.getCurrentTime() >= this.getUpdateInterval()) {
             update();
             timer.reset();
         }
@@ -72,11 +72,15 @@ public class SympleGraphDisplayCore {
         return websocketServer;
     }
 
-    public double getUpdateTime() {
-        return updateTime;
+    public double getUpdateInterval() {
+        return this.settings.getUpdateInterval();
     }
 
-    public void setUpdateTime(double updateTime) {
-        this.updateTime = updateTime;
+    public boolean isStoreData() {
+        return this.settings.isStoreData();
+    }
+
+    public GraphSettings getSettings() {
+        return settings;
     }
 }
